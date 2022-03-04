@@ -1,2 +1,7 @@
-# concurrentprogramming
-Laboratory project on concurrent programming 2022
+# Concurrent programming
+
+## Working Group
+
+| Name Surname (initials) | GUID                                     |
+| ----------------------- | ---------------------------------------- |
+| Jakub Czyżewski         | `{not-generated-yet}`                    |
