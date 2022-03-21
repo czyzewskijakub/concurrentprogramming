@@ -4,4 +4,4 @@
 
 | Name Surname (initials) | GUID                                     |
 | ----------------------- | ---------------------------------------- |
-| Jakub Czyżewski         | `{not-generated-yet}`                    |
+| Jakub Czyżewski         | `{ED167598-1F6D-40B1-9174-478FDA027432}` |
