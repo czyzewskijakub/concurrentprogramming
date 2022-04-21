@@ -46,12 +46,17 @@
         <Reference Include="PresentationFramework" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Startup\App.xaml.cs">
+        <Compile Include="Models\ModelAbstractApi.cs" />
+        <Compile Include="Models\RandomGenerator.cs" />
+        <Compile Include="Models\RelayCommand.cs" />
+        <Compile Include="ViewModels\MainWindowViewModel.cs" />
+        <Compile Include="ViewModels\ViewModelBase.cs" />
+        <Compile Include="Views\App.xaml.cs">
           <DependentUpon>App.xaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
-        <Compile Include="View\BoardView.xaml.cs">
-          <DependentUpon>BoardView.xaml</DependentUpon>
+        <Compile Include="Views\MainWindow.xaml.cs">
+          <DependentUpon>MainWindow.xaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
@@ -70,23 +75,19 @@
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
-      <ApplicationDefinition Include="Startup\App.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <SubType>Designer</SubType>
-      </ApplicationDefinition>
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="Startup\App.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <Page Include="View\BoardView.xaml">
+      <Page Include="Views\MainWindow.xaml">
         <Generator>MSBuild:Compile</Generator>
         <SubType>Designer</SubType>
       </Page>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Model" />
-      <Folder Include="ViewModel" />
+      <ApplicationDefinition Include="Views\App.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <SubType>Designer</SubType>
+      </ApplicationDefinition>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="Views\App.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
