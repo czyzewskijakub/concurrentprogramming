@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace BouncingBalls.Models
+namespace PresentationViewModel.MVVMLight
 {
     public sealed class RelayCommand : ICommand
     {
@@ -9,8 +9,8 @@ namespace BouncingBalls.Models
 
         public RelayCommand(Action execute, Func<bool> canExecute = null)
         {
-          _mExecute = execute ?? throw new ArgumentNullException(nameof(execute));
-          _mCanExecute = canExecute;
+            _mExecute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _mCanExecute = canExecute;
         }
 
         #endregion constructors
@@ -19,12 +19,12 @@ namespace BouncingBalls.Models
         
         public bool CanExecute(object parameter)
         {
-          return _mCanExecute == null || _mCanExecute();
+            return _mCanExecute == null || _mCanExecute();
         }
         
         public void Execute(object parameter)
         {
-          _mExecute();
+            _mExecute();
         }
         
         public event EventHandler CanExecuteChanged;
@@ -35,7 +35,7 @@ namespace BouncingBalls.Models
         
         internal void RaiseCanExecuteChanged()
         {
-          CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion API

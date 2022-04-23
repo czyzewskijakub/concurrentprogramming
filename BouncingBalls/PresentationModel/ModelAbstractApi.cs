@@ -1,4 +1,4 @@
-﻿namespace BouncingBalls.Models
+﻿namespace PresentationModel
 {
     public abstract class ModelAbstractApi
     {

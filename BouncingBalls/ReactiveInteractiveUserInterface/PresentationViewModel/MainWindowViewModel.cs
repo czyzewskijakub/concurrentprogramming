@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Windows;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Threading;
-using BouncingBalls.Models;
+using PresentationModel;
+using PresentationViewModel.MVVMLight;
 
-namespace BouncingBalls.ViewModels
+namespace PresentationViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
@@ -15,7 +14,7 @@ namespace BouncingBalls.ViewModels
         {
             // Fields initialization
             _modelLayer = modelLayer;
-            _coordinates = new ObservableCollection<Point>();
+            _coordinates = new ObservableCollection<MyPoint>();
             _randomGenerator = new RandomGenerator();
             _radius = _modelLayer.Radius;
             _canvasWidth = _modelLayer.CanvasWidth;
@@ -31,7 +30,7 @@ namespace BouncingBalls.ViewModels
 
         private readonly ModelAbstractApi _modelLayer;
         private int _ballsNumber;
-        private readonly ObservableCollection<Point> _coordinates;
+        private readonly ObservableCollection<MyPoint> _coordinates;
         private readonly RandomGenerator _randomGenerator;
         private int _radius;
         private readonly int _canvasWidth;
@@ -60,7 +59,7 @@ namespace BouncingBalls.ViewModels
             }
         }
 
-        public ObservableCollection<Point> Coordinates
+        public ObservableCollection<MyPoint> Coordinates
         {
             get => _coordinates;
             set
@@ -95,7 +94,7 @@ namespace BouncingBalls.ViewModels
             if (Coordinates.Count != 0) return;
             for (var i = 0; i < BallsNumber; i++)
             {
-                var point = new Point(_randomGenerator.GenerateDouble(Radius, _modelLayer.CanvasWidth - Radius), 
+                var point = new MyPoint(_randomGenerator.GenerateDouble(Radius, _modelLayer.CanvasWidth - Radius), 
                     _randomGenerator.GenerateDouble(Radius, _modelLayer.CanvasHeight - Radius));
                 Coordinates.Add(point);
             }
@@ -104,7 +103,7 @@ namespace BouncingBalls.ViewModels
         private void MovingHandler()
         {
             if (BallsNumber == 0) return;
-            _dispatcherTimer.Tick += (sender, args) => MoveBall();
+            _dispatcherTimer.Tick += (s, e) => MoveBall();
             _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 30);
             _dispatcherTimer.Start();
         }
@@ -117,16 +116,16 @@ namespace BouncingBalls.ViewModels
                 // Generate shifts
                 var xShift = _randomGenerator.GenerateDouble(-1, 1);
                 var yShift = _randomGenerator.GenerateDouble(-1, 1);
-                var newPt = Point.Add(copy[i], new Vector(xShift, yShift));
+                var newPt = new MyPoint(copy[i].X + xShift, copy[i].Y + yShift);
                 // Prevent exceeding canvas
-                if (newPt.X - _radius < 0) newPt = new Point(_radius, newPt.Y);
-                if (newPt.X + _radius > _modelLayer.CanvasWidth) newPt = new Point(_modelLayer.CanvasWidth - _radius, newPt.Y);
-                if (newPt.Y - _radius < 0) newPt = new Point(newPt.X, _radius);
-                if (newPt.Y + _radius > _modelLayer.CanvasHeight) newPt = new Point(newPt.X, _modelLayer.CanvasHeight - _radius);
+                if (newPt.X - _radius < 0) newPt = new MyPoint(_radius, newPt.Y);
+                if (newPt.X + _radius > _modelLayer.CanvasWidth) newPt = new MyPoint(_modelLayer.CanvasWidth - _radius, newPt.Y);
+                if (newPt.Y - _radius < 0) newPt = new MyPoint(newPt.X, _radius);
+                if (newPt.Y + _radius > _modelLayer.CanvasHeight) newPt = new MyPoint(newPt.X, _modelLayer.CanvasHeight - _radius);
                 copy[i] = newPt;
             }
             // Refresh collection to subscribe PropertyChange event by setter
-            Coordinates = new ObservableCollection<Point>(copy);
+            Coordinates = new ObservableCollection<MyPoint>(copy);
         }
 
         private void Stop()

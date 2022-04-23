@@ -1,13 +1,13 @@
-﻿<Window x:Class="BouncingBalls.Views.MainWindow"
+﻿<Window x:Class="PresentationView.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:BouncingBalls.ViewModels"
+        xmlns:presentationViewModel="clr-namespace:PresentationViewModel;assembly=PresentationViewModel"
         mc:Ignorable="d"
         Title="Bouncing Balls" Height="auto" Width="auto" ResizeMode="CanMinimize" Background="AliceBlue">
     <Window.DataContext>
-        <vm:MainWindowViewModel />
+        <presentationViewModel:MainWindowViewModel />
     </Window.DataContext>
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Top">

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BouncingBalls.Models
+﻿namespace PresentationViewModel.MVVMLight
 {
     public class RandomGenerator
     {

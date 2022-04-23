@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>10</LangVersion>
+        <TargetFramework>net6.0-windows</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\PresentationModel\PresentationModel.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="WindowsBase">
+        <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\6.0.4\ref\net6.0\WindowsBase.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    
+</Project>

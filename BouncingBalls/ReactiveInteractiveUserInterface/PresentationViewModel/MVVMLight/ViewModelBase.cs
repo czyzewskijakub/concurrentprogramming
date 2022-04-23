@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace BouncingBalls.ViewModels
+namespace PresentationViewModel.MVVMLight
 {
     public class ViewModelBase : INotifyPropertyChanged, INotifyCollectionChanged
     {

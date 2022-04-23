@@ -1,4 +1,4 @@
-﻿namespace BouncingBalls.Views
+﻿namespace PresentationView
 {
     /// <summary>
     /// Interaction logic for App.xaml
