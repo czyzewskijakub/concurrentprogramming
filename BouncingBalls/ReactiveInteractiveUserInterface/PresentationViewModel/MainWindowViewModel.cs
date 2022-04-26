@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using System.Windows.Threading;
+using Logic;
 using PresentationModel;
 using PresentationViewModel.MVVMLight;
 
@@ -19,7 +19,7 @@ namespace PresentationViewModel
             _radius = _modelLayer.Radius;
             _canvasWidth = _modelLayer.CanvasWidth;
             _canvasHeight = _modelLayer.CanvasHeight;
-            _dispatcherTimer = new DispatcherTimer();
+            _timer = new System.Timers.Timer();
 
             // Commands initialization
             GenerateCommand = new RelayCommand(GenerateHandler);
@@ -35,7 +35,7 @@ namespace PresentationViewModel
         private int _radius;
         private readonly int _canvasWidth;
         private readonly int _canvasHeight;
-        private readonly DispatcherTimer _dispatcherTimer;
+        private readonly System.Timers.Timer _timer;
 
         public int BallsNumber
         {
@@ -103,9 +103,12 @@ namespace PresentationViewModel
         private void MovingHandler()
         {
             if (BallsNumber == 0) return;
-            _dispatcherTimer.Tick += (s, e) => MoveBall();
-            _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 30);
-            _dispatcherTimer.Start();
+
+            var context = SynchronizationContext.Current;
+            _timer.Interval = 30;
+            _timer.Elapsed += (_, _) => context.Send(_ => MoveBall(), null);
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
         }
 
         private void MoveBall()
@@ -130,7 +133,7 @@ namespace PresentationViewModel
 
         private void Stop()
         {
-            _dispatcherTimer.Stop();
+            _timer.Enabled = false;
         }
 
         private void ClearBalls()

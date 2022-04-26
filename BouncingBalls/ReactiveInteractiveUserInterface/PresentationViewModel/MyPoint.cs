@@ -1,4 +1,4 @@
-﻿namespace PresentationViewModel.MVVMLight;
+﻿namespace Logic;
 
 public class MyPoint
 {

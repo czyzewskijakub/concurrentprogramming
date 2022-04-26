@@ -1,4 +1,4 @@
-﻿namespace PresentationViewModel.MVVMLight
+﻿namespace PresentationViewModel
 {
     public class RandomGenerator
     {
