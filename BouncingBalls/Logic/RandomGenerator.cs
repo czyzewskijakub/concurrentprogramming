@@ -1,4 +1,4 @@
-﻿namespace PresentationViewModel
+﻿namespace Logic
 {
     public class RandomGenerator
     {

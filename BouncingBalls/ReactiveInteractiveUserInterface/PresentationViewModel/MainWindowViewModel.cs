@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Logic;
 using PresentationModel;
 using PresentationViewModel.MVVMLight;
+using Timer = System.Timers.Timer;
 
 namespace PresentationViewModel
 {
@@ -13,29 +14,26 @@ namespace PresentationViewModel
         private MainWindowViewModel(ModelAbstractApi modelLayer)
         {
             // Fields initialization
-            _modelLayer = modelLayer;
+            var modelLayer1 = modelLayer;
+            LogicAbstractApi logicLayer = new LogicApi();
             _coordinates = new ObservableCollection<MyPoint>();
-            _randomGenerator = new RandomGenerator();
-            _radius = _modelLayer.Radius;
-            _canvasWidth = _modelLayer.CanvasWidth;
-            _canvasHeight = _modelLayer.CanvasHeight;
-            _timer = new System.Timers.Timer();
+            _radius = modelLayer1.Radius;
+            _canvasWidth = modelLayer1.CanvasWidth;
+            _canvasHeight = modelLayer1.CanvasHeight;
+            var timer = new Timer();
 
             // Commands initialization
-            GenerateCommand = new RelayCommand(GenerateHandler);
-            StartMoving = new RelayCommand(MovingHandler);
-            StopMoving = new RelayCommand(Stop);
-            ClearBoard = new RelayCommand(ClearBalls);
+            GenerateCommand = new RelayCommand(() => logicLayer.GenerateHandler(Coordinates, BallsNumber, _radius, _canvasWidth - _radius, _radius, _canvasHeight - _radius));
+            StartMoving = new RelayCommand(() => logicLayer.MovingHandler(Coordinates, timer, BallsNumber, _radius, modelLayer1.CanvasWidth, modelLayer1.CanvasHeight));
+            StopMoving = new RelayCommand(() => logicLayer.Stop(timer));
+            ClearBoard = new RelayCommand(() => logicLayer.ClearBalls(timer, Coordinates));
         }
 
-        private readonly ModelAbstractApi _modelLayer;
         private int _ballsNumber;
         private readonly ObservableCollection<MyPoint> _coordinates;
-        private readonly RandomGenerator _randomGenerator;
         private int _radius;
         private readonly int _canvasWidth;
         private readonly int _canvasHeight;
-        private readonly System.Timers.Timer _timer;
 
         public int BallsNumber
         {
@@ -87,59 +85,6 @@ namespace PresentationViewModel
                 if (value.Equals(_canvasHeight)) return;
                 RaisePropertyChanged();
             }
-        }
-
-        private void GenerateHandler()
-        {
-            if (Coordinates.Count != 0) return;
-            for (var i = 0; i < BallsNumber; i++)
-            {
-                var point = new MyPoint(_randomGenerator.GenerateDouble(Radius, _modelLayer.CanvasWidth - Radius), 
-                    _randomGenerator.GenerateDouble(Radius, _modelLayer.CanvasHeight - Radius));
-                Coordinates.Add(point);
-            }
-        }
-
-        private void MovingHandler()
-        {
-            if (BallsNumber == 0) return;
-
-            var context = SynchronizationContext.Current;
-            _timer.Interval = 30;
-            _timer.Elapsed += (_, _) => context.Send(_ => MoveBall(), null);
-            _timer.AutoReset = true;
-            _timer.Enabled = true;
-        }
-
-        private void MoveBall()
-        {
-            var copy = Coordinates;
-            for (var i = 0; i < Coordinates.Count; i++)
-            {
-                // Generate shifts
-                var xShift = _randomGenerator.GenerateDouble(-1, 1);
-                var yShift = _randomGenerator.GenerateDouble(-1, 1);
-                var newPt = new MyPoint(copy[i].X + xShift, copy[i].Y + yShift);
-                // Prevent exceeding canvas
-                if (newPt.X - _radius < 0) newPt = new MyPoint(_radius, newPt.Y);
-                if (newPt.X + _radius > _modelLayer.CanvasWidth) newPt = new MyPoint(_modelLayer.CanvasWidth - _radius, newPt.Y);
-                if (newPt.Y - _radius < 0) newPt = new MyPoint(newPt.X, _radius);
-                if (newPt.Y + _radius > _modelLayer.CanvasHeight) newPt = new MyPoint(newPt.X, _modelLayer.CanvasHeight - _radius);
-                copy[i] = newPt;
-            }
-            // Refresh collection to subscribe PropertyChange event by setter
-            Coordinates = new ObservableCollection<MyPoint>(copy);
-        }
-
-        private void Stop()
-        {
-            _timer.Enabled = false;
-        }
-
-        private void ClearBalls()
-        {
-            Stop();
-            Coordinates.Clear();
         }
 
         public ICommand GenerateCommand { get; }
