@@ -14,5 +14,10 @@
             return _random.NextDouble() * (max - min) + min;
         }
 
+        public double GenerateDouble()
+        {
+            return _random.NextDouble();
+        }
+
     }
 }

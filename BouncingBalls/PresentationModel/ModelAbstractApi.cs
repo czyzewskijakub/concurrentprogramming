@@ -1,4 +1,6 @@
-﻿namespace PresentationModel
+﻿using System.Collections.ObjectModel;
+
+namespace PresentationModel
 {
     public abstract class ModelAbstractApi
     {

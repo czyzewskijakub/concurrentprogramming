@@ -16,21 +16,21 @@ namespace PresentationViewModel
             // Fields initialization
             var modelLayer1 = modelLayer;
             LogicAbstractApi logicLayer = new LogicApi();
-            _coordinates = new ObservableCollection<MyPoint>();
             _radius = modelLayer1.Radius;
             _canvasWidth = modelLayer1.CanvasWidth;
             _canvasHeight = modelLayer1.CanvasHeight;
             var timer = new Timer();
+            Coordinates = logicLayer.Coordinates();
 
             // Commands initialization
-            GenerateCommand = new RelayCommand(() => logicLayer.GenerateHandler(Coordinates, BallsNumber, _radius, _canvasWidth - _radius, _radius, _canvasHeight - _radius));
-            StartMoving = new RelayCommand(() => logicLayer.MovingHandler(Coordinates, timer, BallsNumber, _radius, modelLayer1.CanvasWidth, modelLayer1.CanvasHeight));
+            GenerateCommand = new RelayCommand(() => logicLayer.GenerateHandler(BallsNumber, _radius, _canvasWidth - _radius, _radius, _canvasHeight - _radius));
+            StartMoving = new RelayCommand(() => logicLayer.MovingHandler(timer, BallsNumber, _radius, modelLayer1.CanvasWidth, modelLayer1.CanvasHeight));
             StopMoving = new RelayCommand(() => logicLayer.Stop(timer));
             ClearBoard = new RelayCommand(() => logicLayer.ClearBalls(timer, Coordinates));
         }
 
         private int _ballsNumber;
-        private readonly ObservableCollection<MyPoint> _coordinates;
+        private ObservableCollection<MyPoint> _coordinates;
         private int _radius;
         private readonly int _canvasWidth;
         private readonly int _canvasHeight;
@@ -62,7 +62,9 @@ namespace PresentationViewModel
             get => _coordinates;
             set
             {
-                if (value == _coordinates) return;
+                if (value.Equals(_coordinates)) 
+                    return;
+                _coordinates = value;
                 RaisePropertyChanged();
             }
         }

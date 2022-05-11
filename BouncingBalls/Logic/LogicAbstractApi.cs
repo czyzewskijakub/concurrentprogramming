@@ -5,13 +5,14 @@ namespace Logic;
 
 public abstract class LogicAbstractApi
 {
-    public abstract void GenerateHandler(ICollection<MyPoint> coordinates, int ballsNumber, int minX, int maxX, int minY,
+    public abstract ObservableCollection<MyPoint> Coordinates();
+    public abstract void GenerateHandler(int ballsNumber, int minX, int maxX, int minY,
         int maxY);
 
-    public abstract void MovingHandler(ObservableCollection<MyPoint> coordinates, System.Timers.Timer timer, int ballsNumber, int radius,
+    public abstract void MovingHandler(System.Timers.Timer timer, int ballsNumber, int radius,
         int maxX, int maxY);
 
-    public abstract void MoveBall(ObservableCollection<MyPoint> coordinates, int radius, int maxX, int maxY);
+    public abstract void MoveBalls(MyPoint point, double newX, double newY, double minX, double minY, double maxX, double maxY, double radius);
 
     public abstract void Stop(System.Timers.Timer timer);
 

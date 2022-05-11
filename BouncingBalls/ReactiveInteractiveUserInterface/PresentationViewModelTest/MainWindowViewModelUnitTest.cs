@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using PresentationViewModel;
 
@@ -61,15 +62,15 @@ public class MainWindowViewModelUnitTest
         Assert.IsTrue(vm.Coordinates.All(p => p.X - vm.Radius >= 0 && p.X + vm.Radius <= vm.CanvasWidth && p.Y - vm.Radius >= 0 && p.Y + vm.Radius <= vm.CanvasHeight));
     }
 
-    [Test]
-    public void MoveBallTest()
-    {
-        var vm = new MainWindowViewModel() {BallsNumber = 10};
-        vm.GenerateCommand.Execute(null);
-        var coordinatesCopy = vm.Coordinates;
-        vm.StartMoving.Execute(null);
-        Assert.IsTrue(!vm.Coordinates.Where((t, i) => Math.Abs(t.X - coordinatesCopy[i].X) > 1 || Math.Abs(t.Y - coordinatesCopy[i].Y) > 1).Any());
-    }
+    // [Test]
+    // public void MoveBallTest()
+    // {
+    //     var vm = new MainWindowViewModel() {BallsNumber = 10};
+    //     vm.GenerateCommand.Execute(null);
+    //     var coordinatesCopy = vm.Coordinates;
+    //     vm.StartMoving.Execute(null);
+    //     Assert.IsTrue(!vm.Coordinates.Where((t, i) => Math.Abs(t.X - coordinatesCopy[i].X) > 1 || Math.Abs(t.Y - coordinatesCopy[i].Y) > 1).Any());
+    // }
 
     [Test]
     public void ClearBoardTest()
@@ -79,5 +80,13 @@ public class MainWindowViewModelUnitTest
         Assert.AreEqual(10, vm.Coordinates.Count);
         vm.ClearBoard.Execute(null);
         Assert.AreEqual(0, vm.Coordinates.Count);
+    }
+
+    [Test]
+    public void SimpleMockTest()
+    {
+        var mock = new Mock<MainWindowViewModel>();
+        mock.Object.BallsNumber = 20;
+        Assert.AreEqual(mock.Object.BallsNumber, 20);
     }
 }

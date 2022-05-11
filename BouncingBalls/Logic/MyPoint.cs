@@ -1,13 +1,44 @@
-﻿namespace Logic;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-public class MyPoint
+namespace Logic;
+
+public class MyPoint : INotifyPropertyChanged
 {
-    public double X { get; set; }
-    public double Y { get; set; }
+    private double x { get; set; }
+    private double y { get; set; }
 
     public MyPoint(double x, double y)
     {
         X = x;
         Y = y;
+    }
+    
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    public double X
+    {
+        get => x;
+        set
+        {
+            if (value.Equals(x)) return;
+            x = value;
+            OnPropertyChanged(nameof(X));
+        }
+    }
+    public double Y
+    {
+        get => y;
+        set
+        {
+            if (value.Equals(y)) return;
+            y = value;
+            OnPropertyChanged(nameof(Y));
+        }
     }
 }
