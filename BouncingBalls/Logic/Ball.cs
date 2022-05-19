@@ -1,17 +1,21 @@
 ﻿using System.ComponentModel;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Logic;
 
-public class MyPoint : INotifyPropertyChanged
+public class Ball : INotifyPropertyChanged
 {
-    private double x { get; set; }
-    private double y { get; set; }
+    private Vector2 _vector;
+    private Vector2 _velocity;
+    private float _mass;
 
-    public MyPoint(double x, double y)
+    public Ball(float x, float y, float mass, Vector2 velocity)
     {
-        X = x;
-        Y = y;
+        _vector.X = x;
+        _vector.Y = y;
+        _mass = mass;
+        _velocity = velocity;
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -21,23 +25,21 @@ public class MyPoint : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
-    public double X
+    public float X
     {
-        get => x;
+        get => _vector.X;
         set
         {
-            if (value.Equals(x)) return;
-            x = value;
+            _vector.X = value;
             OnPropertyChanged(nameof(X));
         }
     }
-    public double Y
+    public float Y
     {
-        get => y;
+        get => _vector.Y;
         set
         {
-            if (value.Equals(y)) return;
-            y = value;
+            _vector.Y = value;
             OnPropertyChanged(nameof(Y));
         }
     }

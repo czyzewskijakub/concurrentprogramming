@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using System.Numerics;
 using Timer = System.Timers.Timer;
 
 namespace Logic;
 
 public class LogicApi : LogicAbstractApi
 {
-        private readonly ObservableCollection<MyPoint> _coordinates = new();
-        public override ObservableCollection<MyPoint> Coordinates() => _coordinates;
+        private readonly ObservableCollection<Ball> _coordinates = new();
+        private readonly CancellationTokenSource _token = new();
+        private readonly object _lock = new();
+        public override ObservableCollection<Ball> Coordinates() => _coordinates;
 
         public override void GenerateHandler(int ballsNumber, int minX, int maxX, int minY, int maxY)
         {
@@ -15,8 +18,8 @@ public class LogicApi : LogicAbstractApi
             if (_coordinates.Count != 0) return;
             for (var i = 0; i < ballsNumber; i++)
             {
-                var point = new MyPoint(randomGenerator.GenerateDouble(minX, maxX), 
-                    randomGenerator.GenerateDouble(minY, maxY));
+                var point = new Ball(randomGenerator.GenerateDouble(minX, maxX), 
+                    randomGenerator.GenerateDouble(minY, maxY), randomGenerator.GenerateDouble(1, 2), new Vector2(2, 2));
                 _coordinates.Add(point);
             }
         }
@@ -49,7 +52,7 @@ public class LogicApi : LogicAbstractApi
                 var y1 = y;
                 Task.Factory.StartNew(
                     () => MoveBalls(_coordinates[i1], x1, y1, radius, radius, maxX - radius, maxY - radius, radius),
-                    CancellationToken.None,
+                    _token.Token,
                     TaskCreationOptions.None,
                     TaskScheduler.FromCurrentSynchronizationContext()
                 );
@@ -57,10 +60,10 @@ public class LogicApi : LogicAbstractApi
             }
         }
 
-        public override async void MoveBalls(MyPoint point, double newX, double newY, double minX, double minY, double maxX, double maxY, double radius)
+        public override async void MoveBalls(Ball point, double newX, double newY, double minX, double minY, double maxX, double maxY, double radius)
         {
             var random = new RandomGenerator();
-            while (true)
+            while (!_token.IsCancellationRequested)
             {
                 var dx2 = newX - point.X;
                 var dy2 = newY - point.Y;
@@ -74,8 +77,11 @@ public class LogicApi : LogicAbstractApi
                 for (i = 0; i < d; i++)
                 {
                     await Task.Delay(5);
-                    point.X += moveX;
-                    point.Y += moveY;
+                    lock (_lock)
+                    {
+                        point.X += (float) moveX;
+                        point.Y += (float) moveY;   
+                    }
                 }
 
                 newX = random.GenerateDouble(minX, maxX) + random.GenerateDouble();
@@ -85,7 +91,7 @@ public class LogicApi : LogicAbstractApi
 
         public override void Stop(Timer timer)
         {
-            timer.Enabled = false;
+            _token.Cancel();
         }
 
         public override void ClearBalls(Timer timer, IList coordinates)

@@ -30,7 +30,7 @@ namespace PresentationViewModel
         }
 
         private int _ballsNumber;
-        private ObservableCollection<MyPoint> _coordinates;
+        private ObservableCollection<Ball> _coordinates;
         private int _radius;
         private readonly int _canvasWidth;
         private readonly int _canvasHeight;
@@ -57,7 +57,7 @@ namespace PresentationViewModel
             }
         }
 
-        public ObservableCollection<MyPoint> Coordinates
+        public ObservableCollection<Ball> Coordinates
         {
             get => _coordinates;
             set
