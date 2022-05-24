@@ -1,4 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using Data;
+using Logic;
 
 namespace PresentationModel
 {
@@ -6,11 +9,15 @@ namespace PresentationModel
     {
         public abstract int CanvasHeight { get; }
         public abstract int CanvasWidth { get; }
-        public abstract int Radius { get; }
+        public abstract int ActualBallsNumber { get; }
 
-        public static ModelAbstractApi CreateApi()
+        public abstract ObservableCollection<BallModel> GenerateHandler(int ballsNumber);
+        
+        public abstract void Stop();
+
+        public static ModelAbstractApi CreateApi(LogicAbstractApi logicApi = default!)
         {
-            return new ModelApi();
+            return new ModelApi(new LogicApi(new DataApi()));
         }
     }
 

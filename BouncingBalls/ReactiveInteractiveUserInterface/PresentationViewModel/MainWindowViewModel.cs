@@ -1,39 +1,31 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
 using System.Windows.Input;
-using Logic;
 using PresentationModel;
 using PresentationViewModel.MVVMLight;
-using Timer = System.Timers.Timer;
 
 namespace PresentationViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public MainWindowViewModel() : this(ModelAbstractApi.CreateApi()) { }
+        private ModelAbstractApi ModelAbstractApi { get; }
 
-        private MainWindowViewModel(ModelAbstractApi modelLayer)
+        public MainWindowViewModel()
         {
+            ModelAbstractApi = ModelAbstractApi.CreateApi();
             // Fields initialization
-            var modelLayer1 = modelLayer;
-            LogicAbstractApi logicLayer = new LogicApi();
-            _radius = modelLayer1.Radius;
-            _canvasWidth = modelLayer1.CanvasWidth;
-            _canvasHeight = modelLayer1.CanvasHeight;
-            var timer = new Timer();
-            Coordinates = logicLayer.Coordinates();
+            CanvasHeight = ModelAbstractApi.CanvasHeight;
+            CanvasWidth = ModelAbstractApi.CanvasWidth;
+            Balls = ModelAbstractApi.GenerateHandler(BallsNumber);
 
             // Commands initialization
-            GenerateCommand = new RelayCommand(() => logicLayer.GenerateHandler(BallsNumber, _radius, _canvasWidth - _radius, _radius, _canvasHeight - _radius));
-            StartMoving = new RelayCommand(() => logicLayer.MovingHandler(timer, BallsNumber, _radius, modelLayer1.CanvasWidth, modelLayer1.CanvasHeight));
-            StopMoving = new RelayCommand(() => logicLayer.Stop(timer));
-            ClearBoard = new RelayCommand(() => logicLayer.ClearBalls(timer, Coordinates));
+            StartCommand = new RelayCommand(() => ModelAbstractApi.GenerateHandler(BallsNumber));
+            StopCommand = new RelayCommand(() => ModelAbstractApi.Stop());
         }
 
         private int _ballsNumber;
-        private ObservableCollection<Ball> _coordinates;
         private int _radius;
-        private readonly int _canvasWidth;
-        private readonly int _canvasHeight;
+        private int _canvasWidth;
+        private int _canvasHeight;
 
         public int BallsNumber
         {
@@ -41,6 +33,7 @@ namespace PresentationViewModel
             set
             {
                 if (value == _ballsNumber) return;
+                //Debug.WriteLine($"New value: {value}");
                 _ballsNumber = value;
                 RaisePropertyChanged();
             }
@@ -56,25 +49,15 @@ namespace PresentationViewModel
                 RaisePropertyChanged();
             }
         }
-
-        public ObservableCollection<Ball> Coordinates
-        {
-            get => _coordinates;
-            set
-            {
-                if (value.Equals(_coordinates)) 
-                    return;
-                _coordinates = value;
-                RaisePropertyChanged();
-            }
-        }
+        
+        public IList Balls { get; }
 
         public int CanvasWidth
         {
             get => _canvasWidth;
             set
             {
-                if (value.Equals(_canvasWidth)) return;
+                _canvasWidth = value;
                 RaisePropertyChanged();
             }
         }
@@ -84,15 +67,13 @@ namespace PresentationViewModel
             get => _canvasHeight;
             set
             {
-                if (value.Equals(_canvasHeight)) return;
+                _canvasHeight = value;
                 RaisePropertyChanged();
             }
         }
 
-        public ICommand GenerateCommand { get; }
-        public ICommand StartMoving { get; }
-        public ICommand StopMoving { get; }
-        public ICommand ClearBoard { get; }
-        
+        public ICommand StartCommand { get; }
+        public ICommand StopCommand { get; }
+
     }
 }

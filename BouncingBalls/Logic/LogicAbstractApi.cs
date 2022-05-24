@@ -1,25 +1,19 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using Data;
 
 namespace Logic;
 
 public abstract class LogicAbstractApi
 {
-    public abstract ObservableCollection<Ball> Coordinates();
-    public abstract void GenerateHandler(int ballsNumber, int minX, int maxX, int minY,
-        int maxY);
+    protected List<BallLogic> BallsLogics = null!;
 
-    public abstract void MovingHandler(System.Timers.Timer timer, int ballsNumber, int radius,
-        int maxX, int maxY);
+    public abstract void GenerateBalls(int ballsNumber);
+    public abstract void StopBalls();
+    public abstract List<BallLogic> GetBalls();
+    public abstract int CanvasHeight { get; }
+    public abstract int CanvasWidth { get; }
 
-    public abstract void MoveBalls(Ball point, double newX, double newY, double minX, double minY, double maxX, double maxY, double radius);
-
-    public abstract void Stop(System.Timers.Timer timer);
-
-    public abstract void ClearBalls(System.Timers.Timer timer, IList coordinates);
-
-    public static LogicAbstractApi CreateApi()
+    public static LogicAbstractApi CreateApi(DataAbstractApi dataAbstractApi = default!)
     {
-        return new LogicApi();
+        return new LogicApi(dataAbstractApi);
     }
 }

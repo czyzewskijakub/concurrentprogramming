@@ -1,103 +1,75 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.ComponentModel;
 using System.Numerics;
-using Timer = System.Timers.Timer;
+using Data;
 
 namespace Logic;
 
-public class LogicApi : LogicAbstractApi
+public sealed class LogicApi : LogicAbstractApi
 {
-        private readonly ObservableCollection<Ball> _coordinates = new();
-        private readonly CancellationTokenSource _token = new();
-        private readonly object _lock = new();
-        public override ObservableCollection<Ball> Coordinates() => _coordinates;
+    private readonly DataAbstractApi _dataAbstractApi;
 
-        public override void GenerateHandler(int ballsNumber, int minX, int maxX, int minY, int maxY)
+    public LogicApi(DataAbstractApi dataAbstractApi)
+    {
+        _dataAbstractApi = dataAbstractApi;
+    }
+
+    public override void GenerateBalls(int ballsNumber)
+    {
+        BallsLogics = new List<BallLogic>();
+        _dataAbstractApi.CreateBalls(ballsNumber);
+        foreach (var ball in _dataAbstractApi.GetBalls())
         {
-            var randomGenerator = new RandomGenerator();
-            if (_coordinates.Count != 0) return;
-            for (var i = 0; i < ballsNumber; i++)
-            {
-                var point = new Ball(randomGenerator.GenerateDouble(minX, maxX), 
-                    randomGenerator.GenerateDouble(minY, maxY), randomGenerator.GenerateDouble(1, 2), new Vector2(2, 2));
-                _coordinates.Add(point);
-            }
+            BallsLogics.Add(new BallLogic(ball));
+            ball.PropertyChanged += DetectCollision;
+        }
+    }
+
+        public override void StopBalls() =>_dataAbstractApi.StopBalls();
+        public override List<BallLogic> GetBalls() => BallsLogics;
+        public override int CanvasHeight => _dataAbstractApi.Height;
+        public override int CanvasWidth => _dataAbstractApi.Width;
+
+        private void DetectCollision(object sender, PropertyChangedEventArgs e)
+        {
+            var b = (BallData)sender;
+            if (e.PropertyName != "Vector") return;
+            Interactions(CanvasHeight, b.Radius, b);
+            b.Movable = true;
         }
 
-        public override void MovingHandler(Timer timer, int ballsNumber, int radius,
-            int maxX, int maxY)
+        private void Interactions(int height, int radius, BallData ballData)
         {
-            if (ballsNumber == 0) return;
-            
-            var random = new RandomGenerator();
-            for (var i = 0; i < _coordinates.Count; i++)
+            foreach (var ball in BallsLogics.Where(ball => ball.BallData != ballData))
             {
-                Thread.Sleep(6);
-                var i1 = i;
-
-                double x;
-                double y;
-                if (i % 2 == 0)
+                ball.BallData.Movable = false;
+                var distance = Vector2.Distance(ballData.Vector, ball.BallData.Vector);
+                // Collision with another ball
+                if (distance <= ballData.Radius + ball.BallData.Radius)
                 {
-                    x = random.GenerateDouble(radius, maxX - radius);
-                    y = maxY - radius;
-                }
-                else
-                {
-                    x = maxX - radius;
-                    y = random.GenerateDouble(radius, maxY - radius);
-                }
-
-                var x1 = x;
-                var y1 = y;
-                Task.Factory.StartNew(
-                    () => MoveBalls(_coordinates[i1], x1, y1, radius, radius, maxX - radius, maxY - radius, radius),
-                    _token.Token,
-                    TaskCreationOptions.None,
-                    TaskScheduler.FromCurrentSynchronizationContext()
-                );
-
-            }
-        }
-
-        public override async void MoveBalls(Ball point, double newX, double newY, double minX, double minY, double maxX, double maxY, double radius)
-        {
-            var random = new RandomGenerator();
-            while (!_token.IsCancellationRequested)
-            {
-                var dx2 = newX - point.X;
-                var dy2 = newY - point.Y;
-                var dx = Math.Abs(point.X - newX);
-                var dy = Math.Abs(point.Y - newY);
-                var d = Math.Sqrt((dx * dx) + (dy * dy));
-                var moveX = dx2 / d;
-                var moveY = dy2 / d;
-
-                int i;
-                for (i = 0; i < d; i++)
-                {
-                    await Task.Delay(5);
-                    lock (_lock)
+                    if (Vector2.Distance(ballData.Vector, ball.BallData.Vector) > Vector2.Distance(ballData.Vector + ballData.Velocity, ball.BallData.Vector + ball.BallData.Velocity))
                     {
-                        point.X += (float) moveX;
-                        point.Y += (float) moveY;   
+                        var newV1 = (ballData.Velocity * (ballData.Mass - ball.BallData.Mass) + ball.BallData.Velocity * 2 * ball.BallData.Mass) / (ballData.Mass + ball.BallData.Mass);
+                        var newV2 = (ball.BallData.Velocity * (ball.BallData.Mass - ballData.Mass) + ballData.Velocity * 2 * ballData.Mass) / (ballData.Mass + ball.BallData.Mass);
+                        if (newV1.X > 5) newV1.X = 5;
+                        if (newV1.Y > 5) newV1.Y = 5;
+                        if (newV1.Y < -5) newV1.Y = -5;
+                        if (newV1.X < -5) newV1.X = -5;
+                        ballData.Velocity = newV1;
+                        ball.BallData.Velocity = newV2;
                     }
                 }
 
-                newX = random.GenerateDouble(minX, maxX) + random.GenerateDouble();
-                newY = random.GenerateDouble(minY, maxY) + random.GenerateDouble();
+                ball.BallData.Movable = true;
+            }
+
+            // Border strike
+            if (ballData.X + ballData.VelocityX > CanvasWidth - radius || ballData.X + ballData.VelocityX < 0)
+            {
+                ballData.VelocityX *= -1;
+            }
+            else if (ballData.Y + ballData.VelocityY > height - radius || ballData.Y + ballData.VelocityY < 0)
+            {
+                ballData.VelocityY *= -1;
             }
         }
-
-        public override void Stop(Timer timer)
-        {
-            _token.Cancel();
-        }
-
-        public override void ClearBalls(Timer timer, IList coordinates)
-        {
-            Stop(timer);
-            coordinates.Clear();
-        }    
-
 }
