@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Numerics;
+using System.Text.Json;
 
 namespace Data
 {
@@ -7,7 +8,11 @@ namespace Data
     {
         private readonly RandomGenerator _randomGenerator = new();
         private CancellationTokenSource? _tokenSource;
+        private readonly List<Task> _tasks = new();
         private readonly object _lock = new();
+        private const string JsonFilename = "log.json";
+
+        public ObservableCollection<BallData> Balls { get; } = new();
 
         public static int Height => 400;
         public static int Width => 800;
@@ -58,6 +63,7 @@ namespace Data
             if (_tokenSource is not {IsCancellationRequested: false}) return;
             _tokenSource.Cancel();
             Balls.Clear();
+            _tasks.Clear();
         }
 
         /**
@@ -67,26 +73,43 @@ namespace Data
          */
         private void MoveBalls()
         {
+            // Update balls positions
             foreach (var ball in Balls)
             {
-                Task.Run(() =>
+                _tasks.Add(Task.Run(async () =>
                 {
                     while (true)
                     {
-                        Thread.Sleep(5);
-                        lock(_lock)
-                        {
-                            ball.Update();
-                            while (ball.Movable == false) { }
-                        }
+                        await Task.Delay(5);
                         ball.Update();
                         try { _tokenSource!.Token.ThrowIfCancellationRequested(); }
                         catch (OperationCanceledException) { break; }
                     }
-                }, _tokenSource!.Token);
+                }, _tokenSource!.Token));
             }
-        }
+            
+            // Write diagnostic data
+            _tasks.Add(Task.Run(async () =>
+            {
+                lock (_lock)
+                {
+                    File.WriteAllText(JsonFilename, string.Empty);
+                }
 
-        public ObservableCollection<BallData> Balls { get; } = new();
+                while (true)
+                {
+                    await Task.Delay(5000);
+                    var opt = new JsonSerializerOptions {WriteIndented = true};
+                    var ballsSerialized =  JsonSerializer.Serialize(Balls, opt);
+                    var jsonString = "[ \"Date/Time\": \"" + DateTime.Now + "\",\n  \"Balls\": " + ballsSerialized + " ]\n";
+                    lock (_lock)
+                    {
+                        File.AppendAllText(JsonFilename, jsonString);
+                    }
+                    try { _tokenSource!.Token.ThrowIfCancellationRequested(); }
+                    catch (OperationCanceledException) { break; }
+                }
+            }));
+        }
     }
 }

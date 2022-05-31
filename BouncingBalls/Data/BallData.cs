@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Data;
 
@@ -20,14 +21,14 @@ public sealed class BallData : INotifyPropertyChanged
     
     public void Update()
     {
-        if (!Movable) return;
         _vector += _velocity;
-        Movable = false;
         OnPropertyChanged(nameof(Vector));
     }
 
+    [JsonIgnore]
     public Vector2 Vector => _vector;
 
+    [JsonIgnore]
     public Vector2 Velocity
     {
         get => _velocity;

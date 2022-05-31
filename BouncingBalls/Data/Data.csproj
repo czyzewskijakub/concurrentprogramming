@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+      <PackageReference Include="System.Text.Json" Version="7.0.0-preview.4.22229.4" />
     </ItemGroup>
 
 </Project>
