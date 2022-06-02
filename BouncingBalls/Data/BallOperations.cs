@@ -10,7 +10,7 @@ namespace Data
         private CancellationTokenSource? _tokenSource;
         private readonly List<Task> _tasks = new();
         private readonly object _lock = new();
-        private const string JsonFilename = "log.json";
+        public string JsonFilename { get; set; } = "../../../../../log.json";
 
         public ObservableCollection<BallData> Balls { get; } = new();
 
@@ -98,16 +98,16 @@ namespace Data
 
                 while (true)
                 {
-                    await Task.Delay(5000);
                     var opt = new JsonSerializerOptions {WriteIndented = true};
                     var ballsSerialized =  JsonSerializer.Serialize(Balls, opt);
-                    var jsonString = "[ \"Date/Time\": \"" + DateTime.Now + "\",\n  \"Balls\": " + ballsSerialized + " ]\n";
+                    var jsonString = "[ \"DateTime\": \"" + DateTime.Now + "\",\n  \"Balls\": " + ballsSerialized + " ]\n";
                     lock (_lock)
                     {
                         File.AppendAllText(JsonFilename, jsonString);
                     }
                     try { _tokenSource!.Token.ThrowIfCancellationRequested(); }
                     catch (OperationCanceledException) { break; }
+                    await Task.Delay(1000);
                 }
             }));
         }

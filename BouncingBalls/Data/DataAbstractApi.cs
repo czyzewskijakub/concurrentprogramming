@@ -6,7 +6,6 @@ public abstract class DataAbstractApi
 {
     public abstract void CreateBalls(int number);
     public abstract void StopBalls();
-    public abstract BallOperations GetStorage();
     public abstract ObservableCollection<BallData> GetBalls();
     public abstract int Width { get; }
     public abstract int Height { get; }

@@ -16,7 +16,6 @@ public sealed class BallData : INotifyPropertyChanged
         Radius = radius;
         Mass = mass;
         _velocity = velocity;
-        Movable = true;
     }
     
     public void Update()
@@ -34,7 +33,6 @@ public sealed class BallData : INotifyPropertyChanged
         get => _velocity;
         set => _velocity = value;
     }
-    public bool Movable { get; set; }
 
     public float X
     {

@@ -17,8 +17,6 @@ public class DataApi : DataAbstractApi
         _ballOperations.StopBalls();
     }
 
-    public override BallOperations GetStorage() => _ballOperations;
-
     public override ObservableCollection<BallData> GetBalls() => _ballOperations.Balls;
 
     public override int Width => BallOperations.Width;
